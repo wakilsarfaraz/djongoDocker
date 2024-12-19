@@ -1,0 +1,45 @@
+<div class="modal fade" id="modalAddMealLog" tabindex="-1" aria-labelledby="modalAddMealLogLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2">Add Meal Log</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5 pt-0">
+                <form id="addMealLogForm" method="post" action="{% url 'meal-log-create' %}">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div id="errorMessages" class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-floating mb-3">
+                        <select name="meal_type" class="form-control rounded-3 {% if form.meal_type.errors %}is-invalid{% endif %}">
+                            <option value="">Select Meal Type</option>
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="Dinner">Dinner</option>
+                            <option value="Snack">Snack</option>
+                        </select>
+                        <label for="mealType">Meal Type</label>
+                        <div class="invalid-feedback">
+                            {{ form.meal_type.errors|join:", " }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <textarea name="notes" class="form-control rounded-3 {% if form.notes.errors %}is-invalid{% endif %}" id="floatingNotes" placeholder="Notes">{{ form.notes.value }}</textarea>
+                        <label for="floatingNotes">Notes</label>
+                        <div class="invalid-feedback">
+                            {{ form.notes.errors|join:", " }}
+                        </div>
+                    </div>
+                    
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit">Add Meal Log</button>
+                    <small class="text-body-secondary">By clicking Add Meal Log, you agree to the terms of use.</small>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

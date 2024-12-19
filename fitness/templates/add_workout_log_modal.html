@@ -1,0 +1,113 @@
+<div class="modal fade" id="modalAddWorkout" tabindex="-1" aria-labelledby="modalAddWorkoutLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2">Add Workout Log</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5 pt-0">
+                <form id="addWorkoutForm" method="post" data-url="{% url 'workout-log-create' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-floating mb-3">
+                        <select id="workoutDropdown" name="workout" class="form-control" required>
+                            <option value="">Select a workout</option>
+                            {% for workout in workouts %}
+                                <option value="{{ workout.id }}">{{ workout.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="workoutDropdown">Workout</label>
+                    </div>
+                
+                    <div class="form-floating mb-3">
+                        <select id="exercisesDropdown" name="exercises_completed" class="form-control" multiple required>
+                            <option value="">Select exercises</option>
+                        </select>
+                        <label for="exercisesDropdown">Exercises Completed</label>
+                    </div>
+                
+                    <div class="form-floating mb-3">
+                        <textarea name="notes" class="form-control rounded-3" id="floatingNotes" placeholder="Notes"></textarea>
+                        <label for="floatingNotes">Notes</label>
+                    </div>
+                
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit">Save Workout Log</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('addWorkoutForm');
+        const workoutDropdown = document.getElementById('workoutDropdown');
+        const exercisesDropdown = document.getElementById('exercisesDropdown');
+    
+        workoutDropdown.addEventListener('change', function () {
+            const workoutId = this.value;
+            if (workoutId) {
+                fetch(`/fitness/workout-exercises/${workoutId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        exercisesDropdown.innerHTML = ''; 
+                        data.exercises.forEach(exercise => {
+                            const option = document.createElement('option');
+                            option.value = exercise.name;
+                            option.textContent = exercise.name;
+                            exercisesDropdown.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching exercises:', error));
+            } else {
+                exercisesDropdown.innerHTML = '<option value="">Select exercises</option>';
+            }
+        });
+    
+        // Handle form submission
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Stop default form submission behavior
+    
+            const url = form.getAttribute('data-url'); // Get URL for submission
+            const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+    
+            // Collect form data
+            const workout = workoutDropdown.value;
+            const exercises = Array.from(exercisesDropdown.selectedOptions).map(option => option.value);
+            const notes = document.getElementById('floatingNotes').value;
+    
+            // Validate required fields
+            if (!workout || exercises.length === 0) {
+                alert('Please select a workout and at least one exercise.');
+                return;
+            }
+    
+            const postData = {
+                workout,
+                exercises_completed: exercises,
+                notes,
+            };
+    
+            // Send POST request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify(postData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload(); 
+                    } else {
+                        console.error(data.errors);
+                        alert('Error adding workout log. Please check the form.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+      </script>
+      

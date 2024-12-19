@@ -1,0 +1,91 @@
+<div class="modal fade" id="modalUpdateWorkout{{ workout.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2">Update Workout Log</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5 pt-0">
+                <form class="updateWorkoutForm" method="post" action="{% url 'workout-log-update' workout.id %}" data-url="{% url 'workout-log-update' workout.id %}">
+                    {% csrf_token %}
+                    <div class="form-floating mb-3">
+                        <select name="workout" class="form-control" id="workoutDropdown{{ workout.id }}" required>
+                            <option value="">Select a workout</option>
+                            {% for option in workouts %}
+                                <option value="{{ option.id }}" {% if option.id == workout.workout.id %}selected{% endif %}>
+                                    {{ option.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <label>Workout</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select name="exercises_completed" class="form-control" id="exercisesDropdown{{ workout.id }}" multiple required>
+                            <option value="">Select exercises</option>
+                            {% for exercise in workout.exercises_completed %}
+                                <option value="{{ exercise }}" selected>{{ exercise }}</option>
+                            {% endfor %}
+                        </select>
+                        <label>Exercises Completed</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea name="notes" class="form-control rounded-3" placeholder="Notes">{{ workout.notes }}</textarea>
+                        <label>Notes</label>
+                    </div>
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const forms = document.querySelectorAll('.updateWorkoutForm');  
+
+    forms.forEach(function (form) {
+        const workoutDropdown = form.querySelector('[name="workout"]');
+        const exercisesDropdown = form.querySelector('[name="exercises_completed"]');
+        const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+        
+        let initialSelectedExercises = Array.from(exercisesDropdown.selectedOptions).map(option => option.value);
+
+        function updateExercises(workoutId) {
+            if (workoutId) {
+                fetch(`/fitness/workout-exercises/${workoutId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        exercisesDropdown.innerHTML = '<option value="">Select exercises</option>'; 
+                        data.exercises.forEach(exercise => {
+                            const option = document.createElement('option');
+                            option.value = exercise.name;
+                            option.textContent = exercise.name;
+                            exercisesDropdown.appendChild(option);
+                        });
+
+                        initialSelectedExercises.forEach(exercise => {
+                            const optionToSelect = exercisesDropdown.querySelector(`option[value='${exercise}']`);
+                            if (optionToSelect) {
+                                optionToSelect.selected = true;
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error fetching exercises:', error));
+            } else {
+                exercisesDropdown.innerHTML = '<option value="">Select exercises</option>';
+            }
+        }
+
+        workoutDropdown.addEventListener('change', function () {
+            const workoutId = this.value;
+            initialSelectedExercises = []; 
+            updateExercises(workoutId);
+        });
+
+        const workoutId = workoutDropdown.value;
+        if (workoutId) {
+            updateExercises(workoutId);
+        }
+    });
+});
+</script>

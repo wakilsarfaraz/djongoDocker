@@ -1,0 +1,38 @@
+<div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2">Login</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5 pt-0">
+                <form id="loginForm" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div id="errorMessages" class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    <div class="form-floating mb-3">
+                        <input type="text" name="username" class="form-control rounded-3 {% if form.username.errors %}is-invalid{% endif %}" 
+                               id="floatingInput" placeholder="username" value="{{ form.username.value }}">
+                        <label for="floatingInput">Username</label>
+                        <div class="invalid-feedback">
+                            {{ form.username.errors|join:", " }}
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" name="password" class="form-control rounded-3 {% if form.password.errors %}is-invalid{% endif %}" 
+                               id="floatingPassword" placeholder="Password">
+                        <label for="floatingPassword">Password</label>
+                        <div class="invalid-feedback">
+                            {{ form.password.errors|join:", " }}
+                        </div>
+                    </div>
+                    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit">Log in</button>
+                    <small class="text-body-secondary">By clicking Log in, you agree to the terms of use.</small>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
