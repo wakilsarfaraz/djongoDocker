@@ -83,12 +83,25 @@ WSGI_APPLICATION = 'fitness_tracker.wsgi.application'
 #         'NAME': 'FitFuel',
 #     }
 # }
+#DATABASES = {
+#     'default': {
+#       'ENGINE': 'djongo',
+ #       'NAME': 'fitMongo',
+ #   }
+#}
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'fitMongo',
+        'NAME': 'django_db',
+        'CLIENT': {
+            'host': 'mongo',  # Matches the service name in docker-compose
+            'port': 27017,
+        }
     }
 }
+
+
 
 
 # Password validation
@@ -131,3 +144,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+
