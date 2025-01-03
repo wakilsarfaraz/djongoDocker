@@ -90,16 +90,31 @@ WSGI_APPLICATION = 'fitness_tracker.wsgi.application'
  #   }
 #}
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': 'fitness_db',
+#         'CLIENT': {
+#             'host': 'localhost',  # Matches the service name in docker-compose
+#             'port': 27017,
+#         }
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'django_db',
+        'NAME': 'fitness_db',
         'CLIENT': {
-            'host': 'mongo',  # Matches the service name in docker-compose
+            'host': 'localhost',
             'port': 27017,
+            'username': '',
+            'password': '',
+            'authSource': 'admin'
         }
     }
 }
+
 
 
 
@@ -145,5 +160,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+DEBUG = True
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
